@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>snake</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 120px;
+        }
+        canvas {
+            border: 2px solid black;
+            position: absolute;
+            margin: auto;  
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Snake</h1>
+    <h2 id="score"></h2>
+    <canvas id="screen"s></canvas>
+</body>
+
+<script>
+    const canvas = document.getElementById("screen");
+    const width = 600; canvas.width = width;
+    const height = 400; canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    const score = document.getElementById('score');
+    const tileSize = 10;
+    const tileX = width/10;
+    const tileY = height/10;
+    document.addEventListener('keypress', (evt) => {
+        const { keyCode } = evt;
+
+        if(keyCode == 119) {
+            snake.move(0)
+        } else if(keyCode == 100) {
+            snake.move(1)
+        } else if(keyCode == 115) {
+            snake.move(2)
+        } else if(keyCode == 97) {
+            snake.move(3)
+        }
+    } );
+
+
+    const fruits = [];
+    function addFruit() {
+        if(fruits.length < 10) {
+            const x = Math.floor(Math.random() * tileX) + 1;
+            const y = Math.floor(Math.random() * tileY) + 1;
+
+            fruits.push([x, y]);
+        }
+    }
+
+    function colision() {
+        for(let tile of snake.body) {
+            for(let j in fruits) {
+                const fruit = fruits[j];
+
+                if(tile[0] == fruit[0]  &&  tile[1] == fruit[1]) {
+                    fruits.splice(j, 1);
+                    snake.size ++;
+                }
+            }
+        }
+    }
+
+    const snake = {
+        body: [[4, 5]],
+        direction: 0,
+        size: 3,
+        draw: function(ctx) {
+            for(let tile of this.body) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(tile[0]*10, tile[1]*10, 10, 10);
+            }
+        },
+        run: function() {
+            const head = this.body[0];
+
+            if(this.direction == 0) {
+                const move = [head[0], head[1]];
+
+                if(move[1] == 0) {
+                    move[1] = tileY - 1;
+                } else {
+                    move[1] --;
+                }
+
+                snake.body.splice(0, 0, move);
+                snake.body.splice(this.size, 3);
+            } else if(this.direction == 1) {
+                const move = [head[0], head[1]]
+
+                if(move[0] == tileX - 1) {
+                    move[0] = 0;
+                } else {
+                    move[0] ++;
+                }
+
+                snake.body.splice(0, 0, move);
+                snake.body.splice(this.size, 3);
+            } else if(this.direction == 2) {
+                const move = [head[0], head[1]];
+
+                if(move[1] == tileY - 1) {
+                    move[1] = 0;
+                } else {
+                    move[1] ++;
+                };
+
+                snake.body.splice(0, 0, move);
+                snake.body.splice(this.size, 3);
+            } else if(this.direction == 3) {
+                const move = [head[0], head[1]];
+
+                if(move[0] == 0) {
+                    move[0] = tileX - 1;
+                } else {
+                    move[0] --;
+                }
+
+                snake.body.splice(0, 0, move);
+                snake.body.splice(this.size, 3);
+            }
+        },
+        move: function(d) {
+            
+            if(this.direction == 0) {
+                if(d == 2) return
+            }
+            if(this.direction == 1) {
+                if(d == 3) return
+            }
+            if(this.direction == 2) {
+                if(d == 0) return
+            }
+            if(this.direction == 3) {
+                if(d == 1) return
+            }
+
+            this.direction = d;
+        }
+    }
+
+    function draw() {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, width, height);
+
+        for(let i = 0; i < height; i += 10) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, i, width, 1);
+        }
+
+        for(let i = 0; i < width; i += 10) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(i, 0, 1, height);
+        }
+
+        for(let i of fruits) {
+            ctx.fillStyle = 'orange';
+            ctx.fillRect((i[0] * 10) + 1, (i[1] * 10 )+ 1, 9, 9)
+        }
+
+        snake.draw(ctx);
+    }
+
+    function run() {
+        console.log(snake.size)
+        score.innerHTML = "Score:     " + snake.size.toString()
+
+        snake.run();
+        colision();
+    }
+
+    setInterval(run, 200);
+    setInterval(draw, 100);
+    setInterval(addFruit, 3000);
+</script>
+</html>
